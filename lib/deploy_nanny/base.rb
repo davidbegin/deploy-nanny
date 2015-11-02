@@ -14,11 +14,18 @@ module DeployNanny
       display_github_shas!
       display_deployed_shas!
       deploy_to_outdated_envs!
+      clear_memoized_values!
     end
 
     private
 
     attr_reader :github_account, :deploy_instructions
+
+    def clear_memoized_values!
+      @updates      = {}
+      @rows         = []
+      @github_table = nil
+    end
 
     def display_deployed_shas!
       puts "\n"
@@ -78,12 +85,16 @@ module DeployNanny
     end
 
     def deploy_to_outdated_envs!
-      @updates.map do |env, apps|
-        apps.map do |app|
+      @updates.each do |env, apps|
+        apps.each do |app|
           puts "Deploying #{app}: #{env}\n".yellow
-          thread = Thread.new {
-            Deployer.new(env: env, app: app, deploy_instructions: deploy_instructions).deploy
-          }
+          deployer = Deployer.new(
+            env: env,
+            app: app,
+            deploy_instructions: deploy_instructions
+          )
+          puts deployer.command
+          Thread.new { deployer.deploy }
         end
       end
     end

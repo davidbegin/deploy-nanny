@@ -18,10 +18,6 @@ module DeployNanny
       }
     end
 
-    private
-
-    attr_reader :env, :app, :deploy_instructions
-
     def command
       cmd = command_template.dup
       deploy_instructions.fetch("deploy_variables").each do |var|
@@ -29,6 +25,10 @@ module DeployNanny
       end
       cmd
     end
+
+    private
+
+    attr_reader :env, :app, :deploy_instructions
 
     def command_template
       deploy_instructions.fetch("deploy_template")
