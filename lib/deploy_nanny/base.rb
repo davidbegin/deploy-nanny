@@ -93,9 +93,8 @@ module DeployNanny
             app: app,
             deploy_instructions: deploy_instructions
           )
-
-          job = fork { deployer.deploy }
-          Process.detach(job)
+          puts deployer.command
+          deployer.deploy
         end
       end
     end
