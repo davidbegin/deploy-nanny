@@ -93,8 +93,9 @@ module DeployNanny
             app: app,
             deploy_instructions: deploy_instructions
           )
-          puts deployer.command
-          Thread.new { deployer.deploy }
+
+          job = fork { deployer.deploy }
+          Process.detach(job)
         end
       end
     end
