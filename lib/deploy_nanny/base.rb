@@ -3,9 +3,10 @@ require 'spinning_cursor'
 
 module DeployNanny
   class Base
-    def initialize(github_account:, deploy_instructions:)
+    def initialize(github_account:, deploy_instructions:, options: {})
       @github_account      = github_account
       @deploy_instructions = deploy_instructions
+      @options             = options
       @rows                = []
       @updates             = {}
     end
@@ -13,13 +14,13 @@ module DeployNanny
     def babysit
       display_github_shas!
       display_deployed_shas!
-      deploy_to_outdated_envs!
+      deploy_to_outdated_envs! unless options.no_deploy
       clear_memoized_values!
     end
 
     private
 
-    attr_reader :github_account, :deploy_instructions
+    attr_reader :github_account, :deploy_instructions, :options
 
     def clear_memoized_values!
       @updates      = {}
