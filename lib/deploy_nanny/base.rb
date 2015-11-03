@@ -3,8 +3,15 @@ require 'spinning_cursor'
 
 module DeployNanny
   class Base
-    def initialize(github_account:, deploy_instructions:, options: {})
+    def initialize(github_account:,
+                   nannyrc:,
+                   environments:,
+                   deploy_instructions:,
+                   options: {})
+
       @github_account      = github_account
+      @nannyrc             = nannyrc
+      @environments        = environments
       @deploy_instructions = deploy_instructions
       @options             = options
       @rows                = []
@@ -20,7 +27,11 @@ module DeployNanny
 
     private
 
-    attr_reader :github_account, :deploy_instructions, :options
+    attr_reader :github_account,
+                :nannyrc,
+                :environments,
+                :deploy_instructions,
+                :options
 
     def clear_memoized_values!
       @updates      = {}
@@ -39,10 +50,10 @@ module DeployNanny
     end
 
     def fetch_and_display_shas!
-      apps.each do |app, app_info|
-        app_info["envs"].each do |env, hash|
-
-          ssh_host = hash["host"]
+      apps.each do |app|
+        envs.each do |env|
+          host       = environments.fetch(env).fetch("host")
+          ssh_host   = "#{app}@#{host}"
           remote_sha = `ssh #{ssh_host} cat app/REVISION`.strip
 
           if github_table.match(app, remote_sha)
@@ -52,7 +63,6 @@ module DeployNanny
             str = @updates[env].to_a
             @updates[env] = str << app
           end
-
         end
       end
 
@@ -63,14 +73,16 @@ module DeployNanny
       )
     end
 
+    def envs
+      @envs ||= deploy_instructions.fetch("envs")
+    end
+
     def apps
-      @apps ||= deploy_instructions.fetch("apps")
+      @apps ||= deploy_instructions.fetch("apps").keys
     end
 
     def application_branches
-      apps.each_with_object({}) do |(env, app_hash), hash|
-        hash[env] = app_hash["branch"]
-      end
+      deploy_instructions.fetch("apps")
     end
 
     def github_table
@@ -92,6 +104,8 @@ module DeployNanny
           deployer = Deployer.new(
             env: env,
             app: app,
+            nannyrc: nannyrc,
+            environments: environments,
             deploy_instructions: deploy_instructions
           )
           puts deployer.command

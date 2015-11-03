@@ -3,9 +3,11 @@ require "open3"
 module DeployNanny
   class Deployer
 
-    def initialize(env:, app:, deploy_instructions:)
+    def initialize(env:, app:, environments:, deploy_instructions:, nannyrc:)
       @env                 = env
       @app                 = app
+      @nannyrc             = nannyrc
+      @environments        = environments
       @deploy_instructions = deploy_instructions
     end
 
@@ -28,18 +30,18 @@ module DeployNanny
 
     private
 
-    attr_reader :env, :app, :deploy_instructions
+    attr_reader :env, :app, :nannyrc, :environments, :deploy_instructions
 
     def command_template
       deploy_instructions.fetch("deploy_template")
     end
 
     def dir
-      deploy_instructions.fetch("apps_directory") + "/#{app}"
+      nannyrc.fetch("apps_directory") + "/#{app}"
     end
 
     def revision
-      apps_config.fetch("branch")
+      deploy_instructions.fetch("apps").fetch(app)
     end
 
     def deploy_info(var)
@@ -49,7 +51,7 @@ module DeployNanny
       when "user"
         env
       when "cap_env"
-        apps_config["envs"][env]["cap_env"]
+        environments.fetch(env).fetch("cap_env")
       end
     end
 

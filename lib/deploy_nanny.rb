@@ -11,7 +11,10 @@ require "ostruct"
 module DeployNanny
 
   class << self
-    def babysit(github_account:, deploy_instructions:)
+    def babysit(github_account:,
+                nannyrc:,
+                environments:,
+                deploy_instructions:)
 
       options = {}
       OptionParser.new do |opts|
@@ -30,6 +33,8 @@ module DeployNanny
 
       babysitter = Base.new(
         github_account: github_account,
+        nannyrc: nannyrc,
+        environments: environments,
         deploy_instructions: deploy_instructions,
         options: options
       )

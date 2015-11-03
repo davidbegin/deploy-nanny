@@ -1,6 +1,6 @@
 # DeployNanny
 
-Some help with managing deploying multiple apps and multiple branches to multiple environments.
+Some help with managing deploying multiple-apps and multiple-branches to multiple-environments.
 
 ## Installation
 
@@ -20,13 +20,38 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+With an executable file called bin/babysit containing the following:
+```ruby
+#!/usr/bin/env ruby
 
-## Development
+require "deploy_nanny"
+require "yaml"
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+environments        = YAML.load_file("environments.yml")
+deploy_instructions = YAML.load_file("deploy_instructions.yml")
+nannyrc             = YAML.load_file(".nannyrc")
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+DeployNanny.babysit(
+  github_account: "yourgithubname",
+  nannyrc: nannyrc,
+  environments: environments,
+  deploy_instructions: deploy_instructions,
+)
+
+```
+
+Create a .nannyrc to specify were all your apps are stored.
+This means you have to have every app nested in the same directory for Mrs. Doubtfire to work.
+
+# .nannyrc
+```
+apps_directory: "/Users/username/app_folder"
+```
+
+```bash
+bin/babysit --help
+bin/babysit --no-deploy
+```
 
 ## Contributing
 
