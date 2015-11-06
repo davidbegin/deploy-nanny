@@ -48,9 +48,11 @@ This means you have to have every app nested in the same directory for Mrs. Doub
 apps_directory: "/Users/username/app_folder"
 ```
 
+##### Options
 ```bash
-bin/babysit --help
-bin/babysit --no-deploy
+-h, --help                       Here are all the options Deploy Nanny takes
+-n, --no-deploy                  Do not auto-deploy out-of-date apps
+-s, --sleep=SLEEP                Time to sleep between sweeps in minutes.
 ```
 
 ## Contributing

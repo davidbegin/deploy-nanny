@@ -24,19 +24,23 @@ module DeployNanny
           options[:no_deploy] = true
         end
 
+				opts.on("-s", "--sleep=SLEEP", "Time to sleep between sweeps in minutes.") do |sleep|
+          options[:sleep] = sleep.to_i * 60
+				end
+
         opts.on_tail("-h", "--help", "Here are all the options Deploy Nanny takes") do
           puts opts
           exit
         end
       end.parse!
-      options = OpenStruct.new(options)
+      @options = OpenStruct.new(options)
 
       babysitter = Base.new(
         github_account: github_account,
         nannyrc: nannyrc,
         environments: environments,
         deploy_instructions: deploy_instructions,
-        options: options
+        options: @options
       )
 
       loop do
@@ -55,7 +59,7 @@ module DeployNanny
     end
 
     def sweep_rest
-      60 * 5
+      @options.sleep || 60 * 5
     end
 
   end
