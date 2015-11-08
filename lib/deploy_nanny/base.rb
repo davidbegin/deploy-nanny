@@ -18,6 +18,9 @@ module DeployNanny
       @updates             = {}
     end
 
+    # Fetches SHA's from Github
+    # Fetch deployed SHA's on server
+    # Deploys out of date apps (unless no_deploy: true is passed on initialization)
     def babysit
       display_github_shas!
       display_deployed_shas!
