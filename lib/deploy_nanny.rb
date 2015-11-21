@@ -3,6 +3,7 @@ require_relative "deploy_nanny/github_table"
 require_relative "deploy_nanny/github_commit"
 require_relative "deploy_nanny/deployer"
 require_relative "deploy_nanny/base"
+require_relative "deploy_nanny/time_formatter"
 require "tty-progressbar"
 require "terminal-table"
 require "optparse"
@@ -68,20 +69,5 @@ module DeployNanny
 
   end
 
-  class TimeFormatter
-    def initialize(progress)
-      @progress = progress
-    end
-
-    def matches?(value)
-      value.to_s =~ /:time/
-    end
-
-    def format(value)
-      time = Time.at((DeployNanny.sweep_rest - @progress.current)).utc.strftime("%M:%S")
-      formatted_str = "Time remaining before next sweep and deploy: #{time}".yellow
-      value.gsub(/:time/, formatted_str)
-    end
-  end
 end
 
